@@ -1,5 +1,5 @@
-import React,{ Component }  from "react";
-
+import React, { Component } from "react";
+import { Loading } from './LoadingComponent';
 import { Card, CardImg, CardText, CardBody, CardTitle, Breadcrumb, BreadcrumbItem, Button, Modal, ModalHeader, ModalBody, Row, Col, Label } from 'reactstrap';
 import { Link } from "react-router-dom";
 import { Control, LocalForm, Errors } from 'react-redux-form';
@@ -22,7 +22,7 @@ function RenderDish({ dish }) {
    }
 }
 
-function RenderComments({comments, addComment, dishId}) {
+function RenderComments({ comments, addComment, dishId }) {
    if (comments != null) {
       const showComments = comments.map((cmt) => {
          const options = { month: "short", year: "numeric", day: "numeric" };
@@ -49,10 +49,25 @@ function RenderComments({comments, addComment, dishId}) {
 }
 
 const DishDetail = (props) => {
-   const dish = props.dish;
-   if (dish == null) {
-      return <div></div>;
-   } else {
+   if (props.isLoading) {
+      return (
+         <div className="container">
+            <div className="row">
+               <Loading />
+            </div>
+         </div>
+      );
+   }
+   else if (props.errMess) {
+      return (
+         <div className="container">
+            <div className="row">
+               <h4>{props.errMess}</h4>
+            </div>
+         </div>
+      );
+   }
+   else if (props.dish != null) {
       return (
          <div className="container">
             <div className="row">
@@ -73,14 +88,15 @@ const DishDetail = (props) => {
             <div className="row">
                <RenderDish dish={props.dish} />
                <RenderComments comments={props.comments}
-        addComment={props.addComment}
-        dishId={props.dish.id}
-      />
+                  addComment={props.addComment}
+                  dishId={props.dish.id}
+               />
 
-               
             </div>
          </div>
       );
+   }else {
+      return <div></div>;
    }
 };
 
@@ -123,7 +139,7 @@ export class CommentForm extends Component {
                <Modal isOpen={this.state.isModalOpen} toggle={this.toggleModal}>
                   <ModalHeader toggle={this.toggleModal}>
                      Submit comment
-                     
+
                   </ModalHeader>
                   <ModalBody>
                      <div className="col">
