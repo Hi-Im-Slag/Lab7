@@ -1,8 +1,8 @@
 import React, { Component } from "react";
-import { Loading } from './LoadingComponent';
-import { Card, CardImg, CardText, CardBody, CardTitle, Breadcrumb, BreadcrumbItem, Button, Modal, ModalHeader, ModalBody, Row, Col, Label } from 'reactstrap';
+import { Card, CardImg, CardText, CardBody, CardTitle, Breadcrumb, BreadcrumbItem, Button, Modal, ModalHeader, ModalBody, Row, Col, Label } from "reactstrap";
 import { Link } from "react-router-dom";
-import { Control, LocalForm, Errors } from 'react-redux-form';
+import { Control, LocalForm, Errors } from "react-redux-form";
+import { Loading } from "./LoadingComponent";
 
 function RenderDish({ dish }) {
    if (dish != null) {
@@ -49,6 +49,7 @@ function RenderComments({ comments, addComment, dishId }) {
 }
 
 const DishDetail = (props) => {
+   const dish = props.dish;
    if (props.isLoading) {
       return (
          <div className="container">
@@ -57,8 +58,7 @@ const DishDetail = (props) => {
             </div>
          </div>
       );
-   }
-   else if (props.errMess) {
+   } else if (props.errMess) {
       return (
          <div className="container">
             <div className="row">
@@ -66,8 +66,9 @@ const DishDetail = (props) => {
             </div>
          </div>
       );
-   }
-   else if (props.dish != null) {
+   } else if (props.dish == null) {
+      return <div></div>;
+   } else if (props.dish != null) {
       return (
          <div className="container">
             <div className="row">
@@ -87,16 +88,10 @@ const DishDetail = (props) => {
             </div>
             <div className="row">
                <RenderDish dish={props.dish} />
-               <RenderComments comments={props.comments}
-                  addComment={props.addComment}
-                  dishId={props.dish.id}
-               />
-
+               <RenderComments comments={props.comments} addComment={props.addComment} dishId={props.dish.id} />
             </div>
          </div>
       );
-   }else {
-      return <div></div>;
    }
 };
 
@@ -124,7 +119,7 @@ export class CommentForm extends Component {
 
    handleSubmit(values) {
       this.toggleModal();
-      //this.props.postComment(this.props.dishId, values.rating, values.author, values.comment);
+      // this.props.postComment(this.props.dishId, values.rating, values.author, values.comment);
       this.props.addComment(this.props.dishId, values.rating, values.author, values.comment);
    }
 
@@ -137,15 +132,14 @@ export class CommentForm extends Component {
 
             <div className="row row-content">
                <Modal isOpen={this.state.isModalOpen} toggle={this.toggleModal}>
-                  <ModalHeader toggle={this.toggleModal}>
-                     Submit comment
-
-                  </ModalHeader>
+                  <ModalHeader toggle={this.toggleModal}>Submit comment</ModalHeader>
                   <ModalBody>
                      <div className="col">
                         <LocalForm onSubmit={(values) => this.handleSubmit(values)}>
                            <Row className="form-group col-12">
-                              <Label htmlFor="rating" className="col-12">Rating</Label>
+                              <Label htmlFor="rating" className="col-12">
+                                 Rating
+                              </Label>
                               <Col className="col-12">
                                  <Control.select model=".rating" name="rating" className="form-control col-12">
                                     <option>1</option>

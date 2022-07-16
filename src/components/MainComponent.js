@@ -1,19 +1,23 @@
 import React, { Component } from "react";
-// import { Navbar, NavbarBrand } from 'reactstrap';
-import Menu from "./MenuComponent";
-import DishDetail from "./DishdetailComponent";
-import { DISHES } from "../shared/dishes";
-import { COMMENTS } from "../shared/comments";
-import { PROMOTIONS } from "../shared/promotions";
-import { LEADERS } from "../shared/leaders";
-import { addComment, fetchDishes } from '../redux/ActionCreators';
+import { Switch, Route, Redirect, withRouter } from "react-router-dom";
+import { connect } from "react-redux";
+import { addComment, fetchDishes } from "../redux/ActionCreators";
+import { actions } from 'react-redux-form';
 import Header from "./HeaderComponent";
 import Footer from "./FooterComponent";
 import Home from "./HomeComponent";
 import About from "./AboutComponent";
 import Contact from "./ContactComponent";
-import { Switch, Route, Redirect, withRouter } from "react-router-dom";
-import { connect } from "react-redux";
+import Menu from "./MenuComponent";
+import DishDetail from "./DishdetailComponent";
+
+const mapDispatchToProps = (dispatch) => ({
+   addComment: (dishId, rating, author, comment) => dispatch(addComment(dishId, rating, author, comment)),
+   fetchDishes: () => {
+      dispatch(fetchDishes());
+   },
+   resetFeedbackForm: () => { dispatch(actions.reset('feedback'))}
+});
 
 const mapStateToProps = (state) => {
    return {
@@ -24,24 +28,12 @@ const mapStateToProps = (state) => {
    };
 };
 
-const mapDispatchToProps = dispatch => ({
-
-   addComment: (dishId, rating, author, comment) => dispatch(addComment(dishId, rating, author, comment)),
-   fetchDishes: () => { dispatch(fetchDishes())}
-});
-
-
 class Main extends Component {
    constructor(props) {
       super(props);
-      this.state = {
-         dishes: DISHES,
-         comments: COMMENTS,
-         promotions: PROMOTIONS,
-         leaders: LEADERS,
-
-         selectedDish: null,
-      };
+   }
+   componentDidMount() {
+      this.props.fetchDishes();
    }
 
    onDishSelect(dishId) {
@@ -59,8 +51,8 @@ class Main extends Component {
                  leader={this.props.leaders.filter((leader) => leader.featured)[0]}
              />
          );
-       };
-
+       }
+   
        const DishWithId = ({match}) => {
          return(
              <DishDetail dish={this.props.dishes.dishes.filter((dish) => dish.id === parseInt(match.params.dishId,10))[0]}
@@ -71,6 +63,7 @@ class Main extends Component {
              />
          );
        };
+   
 
       return (
          <div>
@@ -81,7 +74,7 @@ class Main extends Component {
                   <Route exact path="/aboutus" component={() => <About leaders={this.props.leaders} />} />
                   <Route exact path="/menu" component={() => <Menu dishes={this.props.dishes} />} />
                   <Route path="/menu/:dishId" component={DishWithId} />
-                  <Route exact path="/contactus" component={Contact} />
+                  <Route exact path='/contactus' component={() => <Contact resetFeedbackForm={this.props.resetFeedbackForm} />} />
                   <Redirect to="/home" />
                </Switch>
             </div>
